@@ -1,0 +1,188 @@
+@font-face {
+	font-family: system-stack;
+	src: local('Inter');
+}
+
+:root {
+	--bg: #eef1f8;
+	--bg-soft: #e4e8f4;
+	--panel: #ffffff;
+	--panel-alt: #f2f4fb;
+	--border: #dde2ee;
+	--text: #1b2033;
+	--text-dim: #616a83;
+	--text-faint: #8890a6;
+	--accent: #4f46e5;
+	--accent-2: #7c3aed;
+	--accent-soft: rgba(79, 70, 229, 0.12);
+	--edge-color: #9aa3bd;
+	--danger: #dc2626;
+	--shadow: 0 8px 24px rgba(30, 41, 59, 0.08);
+	--radius: 14px;
+
+	--role-default-0: #cbd5e1;
+	--role-default-1: #64748b;
+	--role-default-2: #3f4a5e;
+	--role-default-3: #2c3446;
+
+	--role-compare-0: #fde68a;
+	--role-compare-1: #fbbf24;
+	--role-compare-2: #d97706;
+	--role-compare-3: #a35709;
+
+	--role-swap-0: #fecdd3;
+	--role-swap-1: #fb7185;
+	--role-swap-2: #e11d48;
+	--role-swap-3: #9f1239;
+
+	--role-pivot-0: #ddd6fe;
+	--role-pivot-1: #a78bfa;
+	--role-pivot-2: #7c3aed;
+	--role-pivot-3: #5b21b6;
+
+	--role-sorted-0: #bbf7d0;
+	--role-sorted-1: #4ade80;
+	--role-sorted-2: #16a34a;
+	--role-sorted-3: #0f6b32;
+
+	--role-active-0: #a5f3fc;
+	--role-active-1: #22d3ee;
+	--role-active-2: #0891b2;
+	--role-active-3: #066a80;
+
+	--role-inserted-0: #99f6e4;
+	--role-inserted-1: #2dd4bf;
+	--role-inserted-2: #0d9488;
+	--role-inserted-3: #0a6f66;
+
+	--role-visiting-0: #f5d0fe;
+	--role-visiting-1: #e879f9;
+	--role-visiting-2: #a21caf;
+	--role-visiting-3: #7a1585;
+
+	--role-bucket-0: #c7d2fe;
+	--role-bucket-1: #818cf8;
+	--role-bucket-2: #4f46e5;
+	--role-bucket-3: #3730a3;
+
+	--tok-keyword: #7c3aed;
+	--tok-string: #16a34a;
+	--tok-number: #c2410c;
+	--tok-function: #2563eb;
+	--tok-comment: #8890a6;
+	--tok-operator: #475569;
+	--tok-class: #0891b2;
+	--tok-punctuation: #616a83;
+}
+
+:root[data-theme='dark'] {
+	--bg: #0d0f1a;
+	--bg-soft: #0a0c15;
+	--panel: #151829;
+	--panel-alt: #1b1f36;
+	--border: #2a2f4d;
+	--text: #e8eaf6;
+	--text-dim: #a3aac8;
+	--text-faint: #6b7291;
+	--accent: #818cf8;
+	--accent-2: #a78bfa;
+	--accent-soft: rgba(129, 140, 248, 0.16);
+	--edge-color: #4b5272;
+	--danger: #f87171;
+	--shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+
+	--tok-keyword: #c4b5fd;
+	--tok-string: #86efac;
+	--tok-number: #fdba74;
+	--tok-function: #93c5fd;
+	--tok-comment: #6b7291;
+	--tok-operator: #cbd5e1;
+	--tok-class: #67e8f9;
+	--tok-punctuation: #a3aac8;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family:
+		system-stack,
+		'Inter',
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		Roboto,
+		Helvetica,
+		Arial,
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	transition:
+		background 0.25s ease,
+		color 0.25s ease;
+}
+
+button {
+	font-family: inherit;
+	cursor: pointer;
+}
+
+input {
+	font-family: inherit;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 8px;
+}
+
+.panel {
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+}
+
+/* Prism token colors */
+.token.keyword {
+	color: var(--tok-keyword);
+	font-weight: 600;
+}
+.token.string {
+	color: var(--tok-string);
+}
+.token.number,
+.token.boolean {
+	color: var(--tok-number);
+}
+.token.function {
+	color: var(--tok-function);
+}
+.token.comment {
+	color: var(--tok-comment);
+	font-style: italic;
+}
+.token.operator,
+.token.punctuation {
+	color: var(--tok-operator);
+}
+.token.class-name,
+.token.builtin {
+	color: var(--tok-class);
+}
