@@ -1,5 +1,5 @@
 import type { AlgorithmDef, SortStep, VizNode, NodeRole } from '../types';
-import { initElems, StepBuilder, type Elem } from './_shared';
+import { initElems, StepBuilder, L, type Elem } from './_shared';
 
 const java = [
 	'public static void mergeSort(int[] arr, int left, int right) {',
@@ -72,11 +72,11 @@ function generate(values: number[]): SortStep[] {
 			return { id: el.id, value: el.value, x: p?.x ?? i, y: p?.y ?? 0, role };
 		});
 
-	sb.push([1], [1], 'Array awal sebelum diurutkan.', snap());
+	sb.push([1], [1], L('Array awal sebelum diurutkan.', 'Initial array before sorting.'), snap());
 
 	if (n <= 1) {
 		arr.forEach((e) => sorted.add(e.id));
-		sb.push([], [], 'Array sudah terurut.', snap());
+		sb.push([], [], L('Array sudah terurut.', 'The array is already sorted.'), snap());
 		return sb.steps;
 	}
 
@@ -91,7 +91,10 @@ function generate(values: number[]): SortStep[] {
 		sb.push(
 			[11, 12],
 			[9, 10],
-			`Salin sub-array kiri [${left}..${mid}] dan kanan [${mid + 1}..${right}] untuk digabung.`,
+			L(
+				`Salin sub-array kiri [${left}..${mid}] dan kanan [${mid + 1}..${right}] untuk digabung.`,
+				`Copy the left sub-array [${left}..${mid}] and right sub-array [${mid + 1}..${right}] to merge.`
+			),
 			snap(activeRoles)
 		);
 
@@ -102,7 +105,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[14, 15],
 				[13, 14],
-				`Bandingkan ${leftArr[i].value} (kiri) dengan ${rightArr[j].value} (kanan).`,
+				L(
+					`Bandingkan ${leftArr[i].value} (kiri) dengan ${rightArr[j].value} (kanan).`,
+					`Compare ${leftArr[i].value} (left) with ${rightArr[j].value} (right).`
+				),
 				snap({ [leftArr[i].id]: 'compare', [rightArr[j].id]: 'compare' })
 			);
 			if (leftArr[i].value <= rightArr[j].value) {
@@ -112,7 +118,10 @@ function generate(values: number[]): SortStep[] {
 				sb.push(
 					[16],
 					[15, 16],
-					`Tempatkan ${leftArr[i].value} dari kiri ke indeks ${k}.`,
+					L(
+						`Tempatkan ${leftArr[i].value} dari kiri ke indeks ${k}.`,
+						`Place ${leftArr[i].value} from the left into index ${k}.`
+					),
 					snap({ [leftArr[i].id]: isTop ? 'sorted' : 'active' })
 				);
 				i++;
@@ -123,7 +132,10 @@ function generate(values: number[]): SortStep[] {
 				sb.push(
 					[18],
 					[17, 18],
-					`Tempatkan ${rightArr[j].value} dari kanan ke indeks ${k}.`,
+					L(
+						`Tempatkan ${rightArr[j].value} dari kanan ke indeks ${k}.`,
+						`Place ${rightArr[j].value} from the right into index ${k}.`
+					),
 					snap({ [rightArr[j].id]: isTop ? 'sorted' : 'active' })
 				);
 				j++;
@@ -137,7 +149,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[21],
 				[20, 21, 22, 23],
-				`Sisa elemen kiri ${leftArr[i].value} ditempatkan di indeks ${k}.`,
+				L(
+					`Sisa elemen kiri ${leftArr[i].value} ditempatkan di indeks ${k}.`,
+					`Remaining left element ${leftArr[i].value} is placed at index ${k}.`
+				),
 				snap({ [leftArr[i].id]: isTop ? 'sorted' : 'active' })
 			);
 			i++;
@@ -150,13 +165,16 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[22],
 				[24, 25, 26, 27],
-				`Sisa elemen kanan ${rightArr[j].value} ditempatkan di indeks ${k}.`,
+				L(
+					`Sisa elemen kanan ${rightArr[j].value} ditempatkan di indeks ${k}.`,
+					`Remaining right element ${rightArr[j].value} is placed at index ${k}.`
+				),
 				snap({ [rightArr[j].id]: isTop ? 'sorted' : 'active' })
 			);
 			j++;
 			k++;
 		}
-		sb.push([6], [6], `Sub-array [${left}..${right}] telah digabung.`, snap());
+		sb.push([6], [6], L(`Sub-array [${left}..${right}] telah digabung.`, `Sub-array [${left}..${right}] has been merged.`), snap());
 	}
 
 	function mergeSortRec(left: number, right: number) {
@@ -165,7 +183,10 @@ function generate(values: number[]): SortStep[] {
 		sb.push(
 			[2, 3],
 			[2, 3],
-			`Bagi sub-array [${left}..${right}] menjadi [${left}..${mid}] dan [${mid + 1}..${right}].`,
+			L(
+				`Bagi sub-array [${left}..${right}] menjadi [${left}..${mid}] dan [${mid + 1}..${right}].`,
+				`Split sub-array [${left}..${right}] into [${left}..${mid}] and [${mid + 1}..${right}].`
+			),
 			snap()
 		);
 		mergeSortRec(left, mid);
@@ -175,14 +196,17 @@ function generate(values: number[]): SortStep[] {
 
 	mergeSortRec(0, n - 1);
 	arr.forEach((e) => sorted.add(e.id));
-	sb.push([8], [], 'Selesai! Array sudah terurut.', snap());
+	sb.push([8], [], L('Selesai! Array sudah terurut.', 'Done! The array is sorted.'), snap());
 	return sb.steps;
 }
 
 export const mergeSort: AlgorithmDef = {
 	id: 'merge',
 	name: 'Merge Sort',
-	shortDescription: 'Membagi array menjadi dua bagian secara rekursif, mengurutkannya, lalu menggabungkan kembali.',
+	shortDescription: {
+		id: 'Membagi array menjadi dua bagian secara rekursif, mengurutkannya, lalu menggabungkan kembali.',
+		en: 'Recursively splits the array in half, sorts each half, then merges them back together.'
+	},
 	layout: 'row',
 	timeComplexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)' },
 	spaceComplexity: 'O(n)',

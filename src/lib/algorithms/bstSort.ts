@@ -1,5 +1,5 @@
 import type { AlgorithmDef, SortStep, VizNode, VizEdge, NodeRole } from '../types';
-import { StepBuilder } from './_shared';
+import { StepBuilder, L } from './_shared';
 
 const java = [
 	'static class Node {',
@@ -141,7 +141,16 @@ function generate(values: number[]): SortStep[] {
 
 	{
 		const { nodes, edges } = snap();
-		sb.push([9], [9], 'Semua nilai akan dimasukkan satu per satu ke Binary Search Tree.', nodes, edges);
+		sb.push(
+			[9],
+			[9],
+			L(
+				'Semua nilai akan dimasukkan satu per satu ke Binary Search Tree.',
+				'Every value will be inserted one by one into a Binary Search Tree.'
+			),
+			nodes,
+			edges
+		);
 	}
 
 	if (n === 0) return sb.steps;
@@ -152,11 +161,14 @@ function generate(values: number[]): SortStep[] {
 			return { id, value, left: null, right: null };
 		}
 		const { nodes, edges } = snap({ [node.id]: 'visiting', [id]: 'active' });
-		const dir = value < node.value ? 'kiri' : 'kanan';
+		const dir = value < node.value ? { id: 'kiri', en: 'left' } : { id: 'kanan', en: 'right' };
 		sb.push(
 			[19, 20, 21, 22],
 			[18, 19, 20, 21],
-			`Bandingkan ${value} dengan ${node.value}: lanjut ke anak ${dir}.`,
+			L(
+				`Bandingkan ${value} dengan ${node.value}: lanjut ke anak ${dir.id}.`,
+				`Compare ${value} with ${node.value}: go to the ${dir.en} child.`
+			),
 			nodes,
 			edges
 		);
@@ -173,23 +185,47 @@ function generate(values: number[]): SortStep[] {
 		const value = values[i];
 		{
 			const { nodes, edges } = snap({ [id]: 'active' });
-			sb.push([8, 9], [8, 9], `Ambil nilai ${value} berikutnya untuk dimasukkan ke BST.`, nodes, edges);
+			sb.push(
+				[8, 9],
+				[8, 9],
+				L(`Ambil nilai ${value} berikutnya untuk dimasukkan ke BST.`, `Take the next value ${value} to insert into the BST.`),
+				nodes,
+				edges
+			);
 		}
 		root = insert(root, value, id);
 		{
 			const { nodes, edges } = snap({ [id]: 'inserted' });
-			sb.push([17, 18], [16, 17], `Posisi kosong ditemukan, sisipkan ${value} sebagai node baru.`, nodes, edges);
+			sb.push(
+				[17, 18],
+				[16, 17],
+				L(
+					`Posisi kosong ditemukan, sisipkan ${value} sebagai node baru.`,
+					`Empty spot found, insert ${value} as a new node.`
+				),
+				nodes,
+				edges
+			);
 		}
 	}
 
 	{
 		const { nodes, edges } = snap();
-		sb.push([11], [11], 'Semua nilai sudah dimasukkan ke BST.', nodes, edges);
+		sb.push([11], [11], L('Semua nilai sudah dimasukkan ke BST.', 'All values have been inserted into the BST.'), nodes, edges);
 	}
 
 	{
 		const { nodes, edges } = snap();
-		sb.push([12], [12], 'Mulai traversal in-order untuk menghasilkan array terurut.', nodes, edges);
+		sb.push(
+			[12],
+			[12],
+			L(
+				'Mulai traversal in-order untuk menghasilkan array terurut.',
+				'Start the in-order traversal to produce the sorted array.'
+			),
+			nodes,
+			edges
+		);
 	}
 
 	function inorder(node: TNode | null) {
@@ -197,14 +233,32 @@ function generate(values: number[]): SortStep[] {
 		inorder(node.left);
 		outputIds.add(node.id);
 		const { nodes, edges } = snap({ [node.id]: 'sorted' });
-		sb.push([28, 29, 30], [27, 28, 29], `Kunjungi (in-order) node ${node.value}, tambahkan ke hasil terurut.`, nodes, edges);
+		sb.push(
+			[28, 29, 30],
+			[27, 28, 29],
+			L(
+				`Kunjungi (in-order) node ${node.value}, tambahkan ke hasil terurut.`,
+				`Visit node ${node.value} (in-order) and append it to the sorted result.`
+			),
+			nodes,
+			edges
+		);
 		inorder(node.right);
 	}
 	inorder(root);
 
 	{
 		const { nodes, edges } = snap();
-		sb.push([13], [13], 'Selesai! Hasil traversal in-order adalah array yang terurut.', nodes, edges);
+		sb.push(
+			[13],
+			[13],
+			L(
+				'Selesai! Hasil traversal in-order adalah array yang terurut.',
+				'Done! The in-order traversal yields the sorted array.'
+			),
+			nodes,
+			edges
+		);
 	}
 	return sb.steps;
 }
@@ -212,7 +266,10 @@ function generate(values: number[]): SortStep[] {
 export const bstSort: AlgorithmDef = {
 	id: 'bst',
 	name: 'BST Sort',
-	shortDescription: 'Memasukkan seluruh elemen ke Binary Search Tree, lalu membaca hasilnya lewat traversal in-order.',
+	shortDescription: {
+		id: 'Memasukkan seluruh elemen ke Binary Search Tree, lalu membaca hasilnya lewat traversal in-order.',
+		en: 'Inserts every element into a Binary Search Tree, then reads the result via in-order traversal.'
+	},
 	layout: 'tree',
 	timeComplexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n²)' },
 	spaceComplexity: 'O(n)',

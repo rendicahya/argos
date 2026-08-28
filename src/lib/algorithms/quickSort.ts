@@ -1,5 +1,5 @@
 import type { AlgorithmDef, SortStep, NodeRole } from '../types';
-import { initElems, snapshotRow, StepBuilder } from './_shared';
+import { initElems, snapshotRow, StepBuilder, L } from './_shared';
 
 const java = [
 	'public static void quickSort(int[] arr, int low, int high) {',
@@ -59,11 +59,11 @@ function generate(values: number[]): SortStep[] {
 		return r;
 	};
 
-	sb.push([1], [1], 'Array awal sebelum diurutkan.', snapshotRow(arr, roles()));
+	sb.push([1], [1], L('Array awal sebelum diurutkan.', 'Initial array before sorting.'), snapshotRow(arr, roles()));
 
 	if (n <= 1) {
 		arr.forEach((e) => sorted.add(e.id));
-		sb.push([], [], 'Array sudah terurut.', snapshotRow(arr, roles()));
+		sb.push([], [], L('Array sudah terurut.', 'The array is already sorted.'), snapshotRow(arr, roles()));
 		return sb.steps;
 	}
 
@@ -72,7 +72,10 @@ function generate(values: number[]): SortStep[] {
 		sb.push(
 			[9, 10],
 			[7, 8],
-			`Pilih pivot: elemen di indeks ${high} (${pivot.value}).`,
+			L(
+				`Pilih pivot: elemen di indeks ${high} (${pivot.value}).`,
+				`Choose the pivot: element at index ${high} (${pivot.value}).`
+			),
 			snapshotRow(arr, roles({ [pivot.id]: 'pivot' }))
 		);
 		let i = low - 1;
@@ -80,7 +83,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[12, 13],
 				[10, 11],
-				`Bandingkan indeks ${j} (${arr[j].value}) dengan pivot (${pivot.value}).`,
+				L(
+					`Bandingkan indeks ${j} (${arr[j].value}) dengan pivot (${pivot.value}).`,
+					`Compare index ${j} (${arr[j].value}) with the pivot (${pivot.value}).`
+				),
 				snapshotRow(arr, roles({ [pivot.id]: 'pivot', [arr[j].id]: 'compare' }))
 			);
 			if (arr[j].value < pivot.value) {
@@ -93,7 +99,10 @@ function generate(values: number[]): SortStep[] {
 					sb.push(
 						[14, 15, 16, 17],
 						[12, 13],
-						`Tukar indeks ${i} dan ${j} karena ${b.value} < pivot.`,
+						L(
+							`Tukar indeks ${i} dan ${j} karena ${b.value} < pivot.`,
+							`Swap index ${i} and ${j} because ${b.value} < pivot.`
+						),
 						snapshotRow(arr, roles({ [pivot.id]: 'pivot', [a.id]: 'swap', [b.id]: 'swap' }))
 					);
 				}
@@ -106,7 +115,10 @@ function generate(values: number[]): SortStep[] {
 		sb.push(
 			[20, 21, 22, 23],
 			[14, 15],
-			`Tempatkan pivot pada posisi akhirnya di indeks ${i + 1}.`,
+			L(
+				`Tempatkan pivot pada posisi akhirnya di indeks ${i + 1}.`,
+				`Place the pivot in its final position at index ${i + 1}.`
+			),
 			snapshotRow(arr, roles({ [arr[i + 1].id]: 'sorted' }))
 		);
 		return i + 1;
@@ -117,7 +129,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[2],
 				[2],
-				`Urutkan sub-array indeks ${low} sampai ${high}.`,
+				L(
+					`Urutkan sub-array indeks ${low} sampai ${high}.`,
+					`Sort the sub-array from index ${low} to ${high}.`
+				),
 				snapshotRow(arr, roles())
 			);
 			const p = partition(low, high);
@@ -130,14 +145,17 @@ function generate(values: number[]): SortStep[] {
 
 	quickSortRec(0, n - 1);
 	arr.forEach((e) => sorted.add(e.id));
-	sb.push([7], [], 'Selesai! Array sudah terurut.', snapshotRow(arr, roles()));
+	sb.push([7], [], L('Selesai! Array sudah terurut.', 'Done! The array is sorted.'), snapshotRow(arr, roles()));
 	return sb.steps;
 }
 
 export const quickSort: AlgorithmDef = {
 	id: 'quick',
 	name: 'Quick Sort',
-	shortDescription: 'Memilih pivot, memisahkan elemen lebih kecil/lebih besar, lalu mengurutkan tiap bagian secara rekursif.',
+	shortDescription: {
+		id: 'Memilih pivot, memisahkan elemen lebih kecil/lebih besar, lalu mengurutkan tiap bagian secara rekursif.',
+		en: 'Picks a pivot, partitions smaller/larger elements around it, then recursively sorts each part.'
+	},
 	layout: 'row',
 	timeComplexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n²)' },
 	spaceComplexity: 'O(log n)',

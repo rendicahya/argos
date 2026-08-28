@@ -1,5 +1,5 @@
 import type { AlgorithmDef, SortStep, NodeRole } from '../types';
-import { initElems, snapshotRow, StepBuilder } from './_shared';
+import { initElems, snapshotRow, StepBuilder, L } from './_shared';
 
 const java = [
 	'public static void bubbleSort(int[] arr) {',
@@ -45,24 +45,32 @@ function generate(values: number[]): SortStep[] {
 		return r;
 	};
 
-	sb.push([1, 2], [1, 2], 'Array awal sebelum diurutkan.', snapshotRow(arr, roles()));
+	sb.push([1, 2], [1, 2], L('Array awal sebelum diurutkan.', 'Initial array before sorting.'), snapshotRow(arr, roles()));
 
 	if (n <= 1) {
 		arr.forEach((e) => sorted.add(e.id));
-		sb.push([], [], 'Array sudah terurut (kurang dari 2 elemen).', snapshotRow(arr, roles()));
+		sb.push(
+			[],
+			[],
+			L('Array sudah terurut (kurang dari 2 elemen).', 'Array is already sorted (fewer than 2 elements).'),
+			snapshotRow(arr, roles())
+		);
 		return sb.steps;
 	}
 
 	for (let i = 0; i < n - 1; i++) {
 		let swappedAny = false;
-		sb.push([3, 4], [3, 4], `Mulai pass ke-${i + 1}.`, snapshotRow(arr, roles()));
+		sb.push([3, 4], [3, 4], L(`Mulai pass ke-${i + 1}.`, `Start pass ${i + 1}.`), snapshotRow(arr, roles()));
 		for (let j = 0; j < n - i - 1; j++) {
 			const a = arr[j];
 			const b = arr[j + 1];
 			sb.push(
 				[5, 6],
 				[5, 6],
-				`Bandingkan elemen indeks ${j} (${a.value}) dengan indeks ${j + 1} (${b.value}).`,
+				L(
+					`Bandingkan elemen indeks ${j} (${a.value}) dengan indeks ${j + 1} (${b.value}).`,
+					`Compare element at index ${j} (${a.value}) with index ${j + 1} (${b.value}).`
+				),
 				snapshotRow(arr, roles({ [a.id]: 'compare', [b.id]: 'compare' }))
 			);
 			if (a.value > b.value) {
@@ -72,7 +80,7 @@ function generate(values: number[]): SortStep[] {
 				sb.push(
 					[7, 8, 9, 10],
 					[7, 8],
-					`Tukar posisi karena ${a.value} > ${b.value}.`,
+					L(`Tukar posisi karena ${a.value} > ${b.value}.`, `Swap them because ${a.value} > ${b.value}.`),
 					snapshotRow(arr, roles({ [a.id]: 'swap', [b.id]: 'swap' }))
 				);
 			}
@@ -81,24 +89,35 @@ function generate(values: number[]): SortStep[] {
 		sb.push(
 			[13],
 			[9, 10],
-			`Elemen indeks ${n - 1 - i} (${arr[n - 1 - i].value}) sudah pada posisi akhirnya.`,
+			L(
+				`Elemen indeks ${n - 1 - i} (${arr[n - 1 - i].value}) sudah pada posisi akhirnya.`,
+				`Element at index ${n - 1 - i} (${arr[n - 1 - i].value}) is now in its final position.`
+			),
 			snapshotRow(arr, roles())
 		);
 		if (!swappedAny) {
 			arr.forEach((e) => sorted.add(e.id));
-			sb.push([13], [9, 10], 'Tidak ada penukaran pada pass ini, array sudah terurut.', snapshotRow(arr, roles()));
+			sb.push(
+				[13],
+				[9, 10],
+				L('Tidak ada penukaran pada pass ini, array sudah terurut.', 'No swaps in this pass, the array is sorted.'),
+				snapshotRow(arr, roles())
+			);
 			break;
 		}
 	}
 	arr.forEach((e) => sorted.add(e.id));
-	sb.push([15], [], 'Selesai! Array sudah terurut.', snapshotRow(arr, roles()));
+	sb.push([15], [], L('Selesai! Array sudah terurut.', 'Done! The array is sorted.'), snapshotRow(arr, roles()));
 	return sb.steps;
 }
 
 export const bubbleSort: AlgorithmDef = {
 	id: 'bubble',
 	name: 'Bubble Sort',
-	shortDescription: 'Membandingkan pasangan elemen bersebelahan dan menukarnya berulang kali hingga terurut.',
+	shortDescription: {
+		id: 'Membandingkan pasangan elemen bersebelahan dan menukarnya berulang kali hingga terurut.',
+		en: 'Repeatedly compares adjacent pairs of elements and swaps them until the array is sorted.'
+	},
 	layout: 'row',
 	timeComplexity: { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)' },
 	spaceComplexity: 'O(1)',

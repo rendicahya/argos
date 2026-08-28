@@ -1,4 +1,9 @@
-import type { VizNode, VizEdge, NodeRole, SortStep } from '../types';
+import type { VizNode, VizEdge, NodeRole, SortStep, LocalizedText } from '../types';
+
+/** Pair an Indonesian and English string into a LocalizedText. */
+export function L(id: string, en: string): LocalizedText {
+	return { id, en };
+}
 
 export interface Elem {
 	id: string;
@@ -22,7 +27,7 @@ export function snapshotRow(arr: Elem[], roles: Record<string, NodeRole> = {}): 
 export class StepBuilder {
 	steps: SortStep[] = [];
 
-	push(java: number[], python: number[], description: string, nodes: VizNode[], edges: VizEdge[] = []) {
+	push(java: number[], python: number[], description: LocalizedText, nodes: VizNode[], edges: VizEdge[] = []) {
 		this.steps.push({ line: { java, python }, description, nodes, edges });
 	}
 }

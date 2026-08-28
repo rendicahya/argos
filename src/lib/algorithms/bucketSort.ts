@@ -1,5 +1,5 @@
 import type { AlgorithmDef, SortStep, VizNode, NodeRole } from '../types';
-import { initElems, StepBuilder, type Elem } from './_shared';
+import { initElems, StepBuilder, L, type Elem } from './_shared';
 
 const BUCKET_COUNT = 10;
 
@@ -67,11 +67,11 @@ function generate(values: number[]): SortStep[] {
 			return { id: el.id, value: el.value, x: p.x, y: p.y, role };
 		});
 
-	sb.push([1, 2], [1, 2], 'Array awal sebelum diurutkan.', snap());
+	sb.push([1, 2], [1, 2], L('Array awal sebelum diurutkan.', 'Initial array before sorting.'), snap());
 
 	if (n <= 1) {
 		if (n === 1) sorted.add(arr[0].id);
-		sb.push([], [], 'Array sudah terurut.', snap());
+		sb.push([], [], L('Array sudah terurut.', 'The array is already sorted.'), snap());
 		return sb.steps;
 	}
 
@@ -80,7 +80,10 @@ function generate(values: number[]): SortStep[] {
 	sb.push(
 		[3, 4, 5],
 		[3, 4, 5],
-		`Cari nilai minimum (${min}) & maksimum (${max}), siapkan ${BUCKET_COUNT} bucket kosong.`,
+		L(
+			`Cari nilai minimum (${min}) & maksimum (${max}), siapkan ${BUCKET_COUNT} bucket kosong.`,
+			`Find the minimum (${min}) and maximum (${max}), and prepare ${BUCKET_COUNT} empty buckets.`
+		),
 		snap()
 	);
 
@@ -94,12 +97,20 @@ function generate(values: number[]): SortStep[] {
 		sb.push(
 			[10],
 			[9],
-			`Hitung indeks bucket untuk nilai ${el.value}: masuk ke bucket ${idx}.`,
+			L(
+				`Hitung indeks bucket untuk nilai ${el.value}: masuk ke bucket ${idx}.`,
+				`Compute the bucket index for value ${el.value}: it goes into bucket ${idx}.`
+			),
 			snap({ [el.id]: 'active' })
 		);
 		buckets[idx].push(el);
 		pos.set(el.id, { x: buckets[idx].length - 1, y: idx + 1 });
-		sb.push([11], [10], `Masukkan ${el.value} ke bucket ${idx}.`, snap({ [el.id]: 'bucket' }));
+		sb.push(
+			[11],
+			[10],
+			L(`Masukkan ${el.value} ke bucket ${idx}.`, `Put ${el.value} into bucket ${idx}.`),
+			snap({ [el.id]: 'bucket' })
+		);
 	}
 
 	for (let b = 0; b < BUCKET_COUNT; b++) {
@@ -107,13 +118,13 @@ function generate(values: number[]): SortStep[] {
 			const before = buckets[b].map((e) => e.value).join(', ');
 			const roleBefore: Record<string, NodeRole> = {};
 			for (const e of buckets[b]) roleBefore[e.id] = 'active';
-			sb.push([15], [13], `Urutkan isi bucket ${b}: [${before}].`, snap(roleBefore));
+			sb.push([15], [13], L(`Urutkan isi bucket ${b}: [${before}].`, `Sort the contents of bucket ${b}: [${before}].`), snap(roleBefore));
 			buckets[b].sort((a, c) => a.value - c.value);
 			buckets[b].forEach((e, i) => pos.set(e.id, { x: i, y: b + 1 }));
 			const after = buckets[b].map((e) => e.value).join(', ');
 			const roleAfter: Record<string, NodeRole> = {};
 			for (const e of buckets[b]) roleAfter[e.id] = 'bucket';
-			sb.push([15], [13], `Bucket ${b} setelah diurutkan: [${after}].`, snap(roleAfter));
+			sb.push([15], [13], L(`Bucket ${b} setelah diurutkan: [${after}].`, `Bucket ${b} after sorting: [${after}].`), snap(roleAfter));
 		}
 	}
 
@@ -125,21 +136,27 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[21],
 				[18, 19],
-				`Ambil ${el.value} dari bucket ${b} ke indeks ${k} pada array hasil.`,
+				L(
+					`Ambil ${el.value} dari bucket ${b} ke indeks ${k} pada array hasil.`,
+					`Take ${el.value} from bucket ${b} into index ${k} of the result array.`
+				),
 				snap({ [el.id]: 'sorted' })
 			);
 			k++;
 		}
 	}
 
-	sb.push([24], [], 'Selesai! Array sudah terurut.', snap());
+	sb.push([24], [], L('Selesai! Array sudah terurut.', 'Done! The array is sorted.'), snap());
 	return sb.steps;
 }
 
 export const bucketSort: AlgorithmDef = {
 	id: 'bucket',
 	name: 'Bucket Sort',
-	shortDescription: 'Menyebar elemen ke beberapa "ember" berdasarkan nilainya, mengurutkan tiap ember, lalu menggabungkannya.',
+	shortDescription: {
+		id: 'Menyebar elemen ke beberapa "ember" berdasarkan nilainya, mengurutkan tiap ember, lalu menggabungkannya.',
+		en: 'Distributes elements into several "buckets" by value, sorts each bucket, then concatenates them.'
+	},
 	layout: 'grid',
 	timeComplexity: { best: 'O(n + k)', average: 'O(n + k)', worst: 'O(n²)' },
 	spaceComplexity: 'O(n + k)',

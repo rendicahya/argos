@@ -1,102 +1,68 @@
 <script lang="ts">
-	import {
-		SvelteFlow,
-		Background,
-		Controls,
-		SvelteFlowProvider,
-		type Node as FlowNode,
-		type Edge as FlowEdge
-	} from '@xyflow/svelte';
-	import '@xyflow/svelte/dist/style.css';
-	import BlockNode from './BlockNode.svelte';
-	import { sortEngine } from '../stores/sortEngine.svelte';
+	import { Canvas } from '@threlte/core';
+	import * as THREE from 'three';
+	import Scene3D from './Scene3D.svelte';
 	import { theme } from '../stores/theme';
+	import { t } from '../stores/locale';
 
-	const nodeTypes = { block: BlockNode };
-
-	const COL_WIDTH = 62;
-	const ROW_HEIGHT = 108;
-	const MIN_BAR_H = 30;
-	const MAX_BAR_H = 148;
-	const PADDING = 50;
-
-	let flowNodes = $derived.by((): FlowNode[] => {
-		const step = sortEngine.currentStep;
-		if (!step || step.nodes.length === 0) return [];
-		const minVal = sortEngine.minValue;
-		const maxVal = sortEngine.maxValue;
-		const range = maxVal - minVal || 1;
-		const minX = Math.min(...step.nodes.map((n) => n.x));
-		const minY = Math.min(...step.nodes.map((n) => n.y));
-		return step.nodes.map((n) => {
-			const heightPx = MIN_BAR_H + ((n.value - minVal) / range) * (MAX_BAR_H - MIN_BAR_H);
-			return {
-				id: n.id,
-				type: 'block',
-				position: {
-					x: (n.x - minX) * COL_WIDTH + PADDING,
-					y: (n.y - minY) * ROW_HEIGHT + PADDING + (MAX_BAR_H - heightPx)
-				},
-				data: { value: n.value, role: n.role, heightPx },
-				draggable: false,
-				selectable: false,
-				focusable: false
-			} satisfies FlowNode;
-		});
-	});
-
-	let flowEdges = $derived.by((): FlowEdge[] => {
-		const step = sortEngine.currentStep;
-		if (!step) return [];
-		return step.edges.map(
-			(e) =>
-				({
-					id: e.id,
-					source: e.source,
-					target: e.target,
-					type: 'straight',
-					style: 'stroke: var(--edge-color); stroke-width: 2px;'
-				}) satisfies FlowEdge
-		);
-	});
+	let dark = $derived($theme === 'dark');
+	let resetView = $state<(() => void) | undefined>();
 </script>
 
-<div class="canvas-wrap">
-	<SvelteFlowProvider>
-		<SvelteFlow
-			nodes={flowNodes}
-			edges={flowEdges}
-			{nodeTypes}
-			colorMode={$theme}
-			fitView
-			fitViewOptions={{ padding: 0.25, duration: 300 }}
-			minZoom={0.15}
-			maxZoom={2.5}
-			nodesDraggable={false}
-			nodesConnectable={false}
-			elementsSelectable={false}
-			panOnScroll
-			proOptions={{ hideAttribution: true }}
-		>
-			<Background gap={28} />
-			<Controls showLock={false} />
-		</SvelteFlow>
-	</SvelteFlowProvider>
+<div class="canvas-wrap" class:dark>
+	<Canvas
+		shadows={THREE.PCFShadowMap}
+		toneMapping={THREE.ACESFilmicToneMapping}
+		colorManagementEnabled
+	>
+		<Scene3D bind:resetView />
+	</Canvas>
+
+	<button
+		class="reset-btn"
+		title={$t.resetViewTitle}
+		onclick={() => resetView?.()}
+	>
+		{$t.resetView}
+	</button>
 </div>
 
 <style>
 	.canvas-wrap {
+		position: relative;
 		width: 100%;
 		height: 100%;
 		min-height: 0;
+		border-radius: inherit;
+		background:
+			radial-gradient(120% 90% at 50% 0%, #f1f5f9 0%, #dbe2ec 55%, #c7d0de 100%);
 	}
-	:global(.svelte-flow__node) {
-		transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	.canvas-wrap.dark {
+		background:
+			radial-gradient(120% 90% at 50% 0%, #182235 0%, #0f172a 55%, #080d18 100%);
 	}
-	:global(.svelte-flow__edge-path) {
-		transition: d 0.35s ease;
+	.canvas-wrap :global(canvas) {
+		display: block;
+		border-radius: inherit;
 	}
-	:global(.svelte-flow) {
-		background: transparent;
+	.reset-btn {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		padding: 6px 12px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--text);
+		background: var(--panel, rgba(255, 255, 255, 0.8));
+		border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+		border-radius: 8px;
+		cursor: pointer;
+		backdrop-filter: blur(6px);
+		transition: opacity 0.15s ease, transform 0.15s ease;
+		opacity: 0.65;
+	}
+	.reset-btn:hover {
+		opacity: 1;
+		transform: translateY(-1px);
 	}
 </style>

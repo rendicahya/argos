@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { theme } from '../stores/theme';
+	import { t } from '../stores/locale';
 </script>
 
-<button class="theme-toggle" onclick={() => theme.toggle()} title="Ganti tema terang/gelap" aria-label="Ganti tema terang/gelap">
+<button class="theme-toggle" onclick={() => theme.toggle()} title={$t.themeToggle} aria-label={$t.themeToggle}>
 	{#if $theme === 'dark'}
 		<span aria-hidden="true">🌙</span>
 	{:else}

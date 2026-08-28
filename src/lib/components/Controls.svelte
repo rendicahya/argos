@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { sortEngine } from '../stores/sortEngine.svelte';
 	import { algorithmList } from '../algorithms';
+	import { locale, t } from '../stores/locale';
 
 	let count = $state(sortEngine.values.length);
 	let manualInput = $state(sortEngine.values.join(', '));
@@ -21,11 +22,11 @@
 			.filter((s) => s.length > 0)
 			.map(Number);
 		if (parts.length === 0 || parts.some((n) => Number.isNaN(n))) {
-			manualError = 'Masukkan angka yang valid, dipisahkan koma.';
+			manualError = $t.errInvalidNumbers;
 			return;
 		}
 		if (parts.length < 2 || parts.length > 30) {
-			manualError = 'Jumlah data harus antara 2 dan 30.';
+			manualError = $t.errCountRange;
 			return;
 		}
 		manualError = '';
@@ -36,7 +37,7 @@
 
 <div class="controls">
 	<section class="block-section">
-		<h3>Algoritma</h3>
+		<h3>{$t.algorithmsHeading}</h3>
 		<div class="algo-grid">
 			{#each algorithmList as algo (algo.id)}
 				<button
@@ -48,51 +49,51 @@
 				</button>
 			{/each}
 		</div>
-		<p class="algo-desc">{sortEngine.algorithm.shortDescription}</p>
+		<p class="algo-desc">{sortEngine.algorithm.shortDescription[$locale]}</p>
 		<div class="complexity">
-			<span>Best <b>{sortEngine.algorithm.timeComplexity.best}</b></span>
-			<span>Avg <b>{sortEngine.algorithm.timeComplexity.average}</b></span>
-			<span>Worst <b>{sortEngine.algorithm.timeComplexity.worst}</b></span>
-			<span>Space <b>{sortEngine.algorithm.spaceComplexity}</b></span>
+			<span>{$t.best} <b>{sortEngine.algorithm.timeComplexity.best}</b></span>
+			<span>{$t.average} <b>{sortEngine.algorithm.timeComplexity.average}</b></span>
+			<span>{$t.worst} <b>{sortEngine.algorithm.timeComplexity.worst}</b></span>
+			<span>{$t.space} <b>{sortEngine.algorithm.spaceComplexity}</b></span>
 		</div>
 	</section>
 
 	<section class="block-section">
-		<h3>Data</h3>
+		<h3>{$t.dataHeading}</h3>
 		<div class="row">
-			<label for="count">Jumlah data acak (2&ndash;30)</label>
+			<label for="count">{$t.randomCountLabel}</label>
 			<div class="inline">
 				<input id="count" type="number" min="2" max="30" bind:value={count} />
-				<button class="btn" onclick={randomize}>🎲 Acak</button>
+				<button class="btn" onclick={randomize}>{$t.shuffle}</button>
 			</div>
 		</div>
 		<div class="row">
-			<label for="manual">Nilai manual (pisahkan dengan koma)</label>
+			<label for="manual">{$t.manualLabel}</label>
 			<div class="inline">
-				<input id="manual" type="text" bind:value={manualInput} placeholder="mis. 5, 3, 8, 1, 9" />
-				<button class="btn" onclick={applyManual}>Terapkan</button>
+				<input id="manual" type="text" bind:value={manualInput} placeholder={$t.manualPlaceholder} />
+				<button class="btn" onclick={applyManual}>{$t.apply}</button>
 			</div>
 			{#if manualError}<p class="error">{manualError}</p>{/if}
 		</div>
 	</section>
 
 	<section class="block-section">
-		<h3>Kontrol Animasi</h3>
+		<h3>{$t.animationHeading}</h3>
 		<div class="playback">
-			<button class="icon-btn" onclick={() => sortEngine.reset()} title="Ulang dari awal">⏮</button>
-			<button class="icon-btn" onclick={() => sortEngine.stepBack()} disabled={sortEngine.isAtStart} title="Langkah mundur">⏪</button>
-			<button class="icon-btn play" onclick={() => sortEngine.togglePlay()} title={sortEngine.playing ? 'Jeda' : 'Putar'}>
+			<button class="icon-btn" onclick={() => sortEngine.reset()} title={$t.restart}>⏮</button>
+			<button class="icon-btn" onclick={() => sortEngine.stepBack()} disabled={sortEngine.isAtStart} title={$t.stepBack}>⏪</button>
+			<button class="icon-btn play" onclick={() => sortEngine.togglePlay()} title={sortEngine.playing ? $t.pause : $t.play}>
 				{#if sortEngine.playing}⏸{:else}▶{/if}
 			</button>
-			<button class="icon-btn" onclick={() => sortEngine.stepForward()} disabled={sortEngine.isAtEnd} title="Langkah maju">⏩</button>
+			<button class="icon-btn" onclick={() => sortEngine.stepForward()} disabled={sortEngine.isAtEnd} title={$t.stepForward}>⏩</button>
 		</div>
 		<div class="row">
-			<label for="speed">Kecepatan</label>
+			<label for="speed">{$t.speed}</label>
 			<input id="speed" type="range" min="1" max="10" bind:value={sortEngine.speed} />
 		</div>
 		<div class="progress-row">
 			<div class="progress-bar"><div class="progress-fill" style="width:{sortEngine.progress * 100}%"></div></div>
-			<span class="step-count">Langkah {sortEngine.steps.length ? sortEngine.stepIndex + 1 : 0} / {sortEngine.steps.length}</span>
+			<span class="step-count">{$t.stepLabel} {sortEngine.steps.length ? sortEngine.stepIndex + 1 : 0} / {sortEngine.steps.length}</span>
 		</div>
 	</section>
 </div>

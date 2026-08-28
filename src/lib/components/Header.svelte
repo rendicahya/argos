@@ -1,5 +1,7 @@
 <script lang="ts">
 	import ThemeToggle from './ThemeToggle.svelte';
+	import LangToggle from './LangToggle.svelte';
+	import { t } from '../stores/locale';
 </script>
 
 <header class="header">
@@ -19,10 +21,13 @@
 		</svg>
 		<div class="brand-text">
 			<h1>Argos</h1>
-			<p>Visualisasi Algoritma Sorting &mdash; Algoritma &amp; Struktur Data</p>
+			<p>{$t.appTagline}</p>
 		</div>
 	</div>
-	<ThemeToggle />
+	<div class="header-actions">
+		<LangToggle />
+		<ThemeToggle />
+	</div>
 </header>
 
 <style>
@@ -38,6 +43,11 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
+	}
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 10px;
 	}
 	.brand-text h1 {
 		margin: 0;

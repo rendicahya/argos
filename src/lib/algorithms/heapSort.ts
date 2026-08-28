@@ -1,5 +1,5 @@
 import type { AlgorithmDef, SortStep, VizNode, VizEdge, NodeRole } from '../types';
-import { initElems, StepBuilder } from './_shared';
+import { initElems, StepBuilder, L } from './_shared';
 
 const java = [
 	'public static void heapSort(int[] arr) {',
@@ -92,13 +92,19 @@ function generate(values: number[]): SortStep[] {
 
 	{
 		const { nodes, edges } = snap(n);
-		sb.push([1, 2], [1, 2], 'Array direpresentasikan sebagai complete binary tree.', nodes, edges);
+		sb.push(
+			[1, 2],
+			[1, 2],
+			L('Array direpresentasikan sebagai complete binary tree.', 'The array is represented as a complete binary tree.'),
+			nodes,
+			edges
+		);
 	}
 
 	if (n <= 1) {
 		if (n === 1) sorted.add(arr[0].id);
 		const { nodes, edges } = snap(n);
-		sb.push([], [], 'Array sudah terurut.', nodes, edges);
+		sb.push([], [], L('Array sudah terurut.', 'The array is already sorted.'), nodes, edges);
 		return sb.steps;
 	}
 
@@ -111,7 +117,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[14, 15, 16, 17],
 				[9, 10, 11, 12],
-				`Heapify di root indeks ${root}: cari elemen terbesar antara root dan anak-anaknya.`,
+				L(
+					`Heapify di root indeks ${root}: cari elemen terbesar antara root dan anak-anaknya.`,
+					`Heapify at root index ${root}: find the largest among the root and its children.`
+				),
 				nodes,
 				edges
 			);
@@ -121,7 +130,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[18, 19, 20],
 				[13, 14],
-				`Bandingkan anak kiri (${arr[left].value}) dengan largest saat ini (${arr[largest].value}).`,
+				L(
+					`Bandingkan anak kiri (${arr[left].value}) dengan largest saat ini (${arr[largest].value}).`,
+					`Compare the left child (${arr[left].value}) with the current largest (${arr[largest].value}).`
+				),
 				nodes,
 				edges
 			);
@@ -136,7 +148,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[21, 22, 23],
 				[15, 16],
-				`Bandingkan anak kanan (${arr[right].value}) dengan largest saat ini (${arr[largest].value}).`,
+				L(
+					`Bandingkan anak kanan (${arr[right].value}) dengan largest saat ini (${arr[largest].value}).`,
+					`Compare the right child (${arr[right].value}) with the current largest (${arr[largest].value}).`
+				),
 				nodes,
 				edges
 			);
@@ -148,19 +163,34 @@ function generate(values: number[]): SortStep[] {
 			arr[root] = b;
 			arr[largest] = a;
 			const { nodes, edges } = snap(size, { [a.id]: 'swap', [b.id]: 'swap' });
-			sb.push([25, 26, 27], [18], `Tukar ${a.value} dan ${b.value} karena anak lebih besar dari root.`, nodes, edges);
+			sb.push(
+				[25, 26, 27],
+				[18],
+				L(
+					`Tukar ${a.value} dan ${b.value} karena anak lebih besar dari root.`,
+					`Swap ${a.value} and ${b.value} because the child is larger than the root.`
+				),
+				nodes,
+				edges
+			);
 			heapify(size, largest);
 		}
 	}
 
 	for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
 		const { nodes, edges } = snap(n, { [arr[i].id]: 'active' });
-		sb.push([3, 4], [3, 4], `Bangun max-heap: heapify dari indeks ${i}.`, nodes, edges);
+		sb.push(
+			[3, 4],
+			[3, 4],
+			L(`Bangun max-heap: heapify dari indeks ${i}.`, `Build the max-heap: heapify from index ${i}.`),
+			nodes,
+			edges
+		);
 		heapify(n, i);
 	}
 	{
 		const { nodes, edges } = snap(n);
-		sb.push([5], [], 'Max-heap selesai dibangun.', nodes, edges);
+		sb.push([5], [], L('Max-heap selesai dibangun.', 'The max-heap has been built.'), nodes, edges);
 	}
 
 	for (let i = n - 1; i > 0; i--) {
@@ -169,7 +199,10 @@ function generate(values: number[]): SortStep[] {
 			sb.push(
 				[7, 8, 9],
 				[6],
-				`Tukar root (maksimum: ${arr[0].value}) dengan elemen terakhir heap (indeks ${i}).`,
+				L(
+					`Tukar root (maksimum: ${arr[0].value}) dengan elemen terakhir heap (indeks ${i}).`,
+					`Swap the root (maximum: ${arr[0].value}) with the last heap element (index ${i}).`
+				),
 				nodes,
 				edges
 			);
@@ -180,16 +213,22 @@ function generate(values: number[]): SortStep[] {
 		sorted.add(arr[i].id);
 		{
 			const { nodes, edges } = snap(i, { [arr[i].id]: 'sorted' });
-			sb.push([9], [6], `${arr[i].value} sudah pada posisi terurutnya.`, nodes, edges);
+			sb.push(
+				[9],
+				[6],
+				L(`${arr[i].value} sudah pada posisi terurutnya.`, `${arr[i].value} is now in its sorted position.`),
+				nodes,
+				edges
+			);
 		}
 		const { nodes: n2, edges: e2 } = snap(i, { [arr[0].id]: 'active' });
-		sb.push([10], [7], `Heapify ulang heap berukuran ${i}.`, n2, e2);
+		sb.push([10], [7], L(`Heapify ulang heap berukuran ${i}.`, `Re-heapify the heap of size ${i}.`), n2, e2);
 		heapify(i, 0);
 	}
 	sorted.add(arr[0].id);
 	{
 		const { nodes, edges } = snap(0);
-		sb.push([12], [], 'Selesai! Array sudah terurut.', nodes, edges);
+		sb.push([12], [], L('Selesai! Array sudah terurut.', 'Done! The array is sorted.'), nodes, edges);
 	}
 	return sb.steps;
 }
@@ -197,7 +236,10 @@ function generate(values: number[]): SortStep[] {
 export const heapSort: AlgorithmDef = {
 	id: 'heap',
 	name: 'Heap Sort',
-	shortDescription: 'Membangun struktur max-heap, lalu berulang kali mengambil elemen terbesar ke posisi akhirnya.',
+	shortDescription: {
+		id: 'Membangun struktur max-heap, lalu berulang kali mengambil elemen terbesar ke posisi akhirnya.',
+		en: 'Builds a max-heap, then repeatedly moves the largest element to its final position.'
+	},
 	layout: 'tree',
 	timeComplexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)' },
 	spaceComplexity: 'O(1)',

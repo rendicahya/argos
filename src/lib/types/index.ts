@@ -30,7 +30,7 @@ export interface VizEdge {
 
 export interface SortStep {
 	line: { java: number[]; python: number[] };
-	description: string;
+	description: LocalizedText;
 	nodes: VizNode[];
 	edges: VizEdge[];
 }
@@ -40,7 +40,7 @@ export type Layout = 'row' | 'grid' | 'tree';
 export interface AlgorithmDef {
 	id: AlgorithmId;
 	name: string;
-	shortDescription: string;
+	shortDescription: LocalizedText;
 	layout: Layout;
 	timeComplexity: { best: string; average: string; worst: string };
 	spaceComplexity: string;
@@ -52,3 +52,10 @@ export interface AlgorithmDef {
 export type ThemeMode = 'light' | 'dark';
 
 export type CodeLang = 'java' | 'python';
+
+export type Locale = 'en' | 'id';
+
+export interface LocalizedText {
+	en: string;
+	id: string;
+}
